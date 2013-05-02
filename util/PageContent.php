@@ -1,8 +1,24 @@
 <?php
 
 class PageContent
-{
-  function displayHtmlHeader($htmlTitle, $htmlHead) 
+{                                                                
+  private static $instance;   
+
+  public static function getInstance() 
+  {
+    if(!self::$instance) 
+    { 
+      self::$instance = new self(); 
+    } 
+
+    return self::$instance;
+  }
+  
+  private function __construct() 
+  {
+  }
+  
+  public function displayHtmlHeader($htmlTitle, $htmlHead) 
   {
   
 ?>
@@ -12,8 +28,8 @@ class PageContent
   <head>
     <title>ECSH :: <?php echo $htmlTitle; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel = 'shortcut icon' href = 'favicon.ico' />
+    <link href="<?php echo BASE_URL; ?>/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel = 'shortcut icon' href = '<?php echo BASE_URL; ?>favicon.ico' />
     <?php echo $htmlHead; ?>
   </head>
   
@@ -21,7 +37,7 @@ class PageContent
 
   }
   
-  function displayHtmlBody($htmlContent, $baseUrl, $navPath)
+  public function displayHtmlBody($user, $htmlContent, $navPath, $message, $messageType)
   {
   
 ?>
@@ -29,87 +45,108 @@ class PageContent
 <?php    
     if($navPath !== NULL) 
     {
-      echo '<div class="container">' . $this->displayNavigation($baseUrl, $navPath) . '</div>';
+      $this->displayNavigation($user, $navPath);
     } 
     
-    echo '<div class="container">' . $htmlContent . '</div>'; 
+    if($message !== NULL)
+    {
+      $this->displayMessage($message, $messageType);
+    }
+    
+    echo '<div class="container">' . $htmlContent; 
   } 
   
-  function displayHtmlFooter() 
+  public function displayHtmlFooter($htmlContent) 
   {
   
 ?>
     
     </div> <!-- /.container -->            
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="<?php echo BASE_URL; ?>/js/jquery-1.9.1.min.js"></script> 
+    <script type="text/javascript" src="<?php echo BASE_URL; ?>/js/bootstrap.min.js"></script>
   </body>
+  <?php echo $htmlContent; ?>
 </html>
 
 <?php
          
   }
   
-  function displayNavigation($baseUrl, $navPath) 
-  {             
-    $navLabels = array('Home', 'Hospitals');
-    $navUrls = array('', '/hospitals.php');
+  public function displayNavigation($user, $navPath) 
+  {                                
+    $navigationPaths = array(NAV_HOME, NAV_HOSPITAL, NAV_USER, NAV_ACCOUNT, NAV_LOGOUT);
+    $navigationLabels = array('Home', 'Hospital', 'User', 'Account', 'Logout');
+    $func = function($path) {
+      return Redirector::getInstance()->getPagePath($path);
+    };
+    $navigationUrls = array_map($func, array(PAGE_HOME, PAGE_HOSPITAL, PAGE_USER, PAGE_ACCOUNT, ACTION_USER_LOGOUT));
+    $navigationPermissions = array(NULL, ROLE_ADMIN, ROLE_ADMIN, NULL, NULL);
 
 ?>
   
       <div class="navbar-wrapper">
-        <div class="navbar">
-          <div class="navbar-inner">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="<?php echo $baseUrl . $navUrls[0]; ?>">EHCS</a>
-            <div class="nav-collapse collapse">
-              <ul class="nav">
+        <div class="container">
+          <div class="navbar">
+            <div class="navbar-inner">
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </a>
+              <a class="brand" href="<?php echo BASE_URL . $navigationUrls[0]; ?>.php">EHCS</a>
+              <div class="nav-collapse collapse">
+                <ul class="nav">
 <?php
-    for($i = 0; $i < 2; $i++)
+    for($i = 0, $size = count($navigationPaths); $i < $size; $i++)
     {
-      echo '<li';
-      if($i == $navPath)
-      {
-        echo ' class="active"';
-      }
-      echo '><a href="' . $baseUrl . $navUrls[$i] . '">' . $navLabels[$i] . '</a></li>';    
+      if(NULL === $navigationPermissions[$i] || User::getInstance()->getPermission($navigationPermissions[$i]))
+      { 
+        echo '<li';
+        if($i == $navPath)
+        {
+          echo ' class="active"';
+        }      
+        echo '><a href="' . BASE_URL . $navigationUrls[$i] . '.php">' . $navigationLabels[$i] . '</a></li>';  
+      }  
     }
 
 ?>              
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li class="nav-header">Nav header</li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div><!--/.nav-collapse -->
-          </div><!-- /.navbar-inner -->
-        </div><!-- /.navbar -->
+            
+                </ul>
+              </div><!--/.nav-collapse -->
+            </div><!-- /.navbar-inner -->
+          </div><!-- /.navbar -->     
+        </div><!-- /.container -->
+      </div><!-- /.navbar-wrapper -->
 <?php
          
   }
   
-  function getLoginForm()
-  {
-    return '<div class="span6">
-              <form class="form-signin">
-                <h2 class="form-signin-heading">Please sign in</h2>
-                <input type="text" class="input-block-level" placeholder="Email address">
-                <input type="password" class="input-block-level" placeholder="Password">
-                <button class="btn btn-large btn-primary" type="submit">Sign in</button>
-              </form>
-            </div>';
+  public function displayMessage($message, $messageType)
+  { 
+    if($message !== NULL)
+    {               
+      switch($messageType)
+      {
+        case MSG_ERROR: 
+          $cssClass = 'error';
+          break;
+        case MSG_WARNING: 
+          $cssClass = 'warning';
+          break;     
+        case MSG_INFO: 
+          $cssClass = 'info';
+          break;     
+        case MSG_SUCCESS: 
+          $cssClass = 'success';
+          break;     
+        default: 
+          $cssClass = '';
+          break;
+      }
+      
+      echo '<div class="container"><table class="table"><tr class="' . $cssClass . '"><td>' . $message . '</td><tr></table></div>';
+    }
   }
 }
 

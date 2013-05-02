@@ -1,71 +1,92 @@
 <?php
-
-require_once 'constants.php'; 
-
+                  
+require_once('constants.php');
+function __autoload($class_name) {
+    include $class_name . '.php';
+}
+     
 class EHCS 
-{        
-  var $pagePath;      
-  var $navPath;      
-  var $permissionRequired; 
-  var $baseUrl = 'http://localhost/petprojects/ehcs';
+{                
+  private static $instance;
+  private $pagePath; 
+  private $navPath;      
+  private $permissionRequired; 
+  private $htmlTitle;
+  private $htmlHead;
+  private $htmlContent;
+  private $footerContent;
   
-  var $htmlTitle;
-  var $htmlHead;
-  var $htmlContent;
-  
-  var $pageContent;
-  
-  function init() 
+  public static function getInstance() 
   {
-    $this->initSession();
-    $this->initDatabase();  
+    if(!self::$instance) 
+    { 
+      self::$instance = new self(); 
+    }                        
+
+    return self::$instance;
+  } 
+  
+  public function setPagePath($pagePath)
+  {
+    $this->pagePath = $pagePath;  
+  }
+  public function setNavPath($navPath)
+  {
+    $this->navPath = $navPath;  
+  }
+  public function setPermissionRequired($permissionRequired)
+  {
+    $this->permissionRequired = $permissionRequired;  
+  }
+  public function setHtmlTitle($htmlTitle)
+  {
+    $this->htmlTitle = $htmlTitle;  
+  }
+  public function setHtmlHead($htmlHead)
+  {
+    $this->htmlHead = $htmlHead;  
+  }
+  public function setHtmlContent($htmlContent)
+  {
+    $this->htmlContent = $htmlContent;  
+  }
+  public function setFooterContent($footerContent)
+  {
+    $this->footerContent = $footerContent;  
+  }
+
+  public function init() 
+  {  
     $this->checkUserPermission();
-  }
-  
-  function redirectWithError($error) 
-  {      
-    switch ($error) 
-    {                              
-    		case ERROR_LOGIN: 
-          $path = 'index.php';
-    		  break;
-    		case ERROR_CONNECTION: 
-        case ERROR_DB: 
-    		case ERROR_PERMISSION: 
-        default:
-          $path = 'error.php';
-          break;
-    } 
-    header("location:$this->baseUrl/$path.php?error=$error&path=$pagePath");
-    exit;
-  }  
-  
-  function getErrorDescription($error)
-  {
-    switch ($error) 
-    {
-    		case ERROR_CONNECTION: 
-          $errorDescription = 'Could not connect to data source';     
-          break;
-        case ERROR_DB: 
-          $errorDescription =  'Could not connect to database';   
-          break;
-    		case ERROR_LOGIN: 
-          $errorDescription =  'Please login to continue';    
-          break;
-    		case ERROR_PERMISSION: 
-          $errorDescription =  'That is a restricted page';  
-          break;
-        default:
-          $errorDescription =  'An unidentified error has occurred';  
-          break;
-    } 
+  } 
+  public function display() {          
+    PageContent::getInstance()->displayHtmlHeader($this->htmlTitle, $this->htmlHead);  
     
-    return $errorDescription;
+    $errorCode = Request::getInstance()->getGet('error');
+    
+    if($errorCode !== NULL)
+    {
+      $message = Redirector::getInstance()->getErrorMessage($errorCode);
+      $messageType = MSG_ERROR;
+    }
+    else
+    {
+      $successCode = Request::getInstance()->getGet('success');
+      if($successCode !== NULL)
+      {
+        $message = Redirector::getInstance()->getSuccessMessage($successCode);
+        $messageType = MSG_SUCCESS; 
+      }
+    }
+                     
+    PageContent::getInstance()->displayHtmlBody(User::getInstance(), $this->htmlContent, $this->navPath, $message, $messageType);           
+    PageContent::getInstance()->displayHtmlFooter($this->footerContent);   
   }
+                  
+  //===================================== private =====================================
   
-  function initSession() 
-  {                   
+  private function __construct() 
+  {    
     // prevent server caching of pages
     header("Cache-Control: no-store, no-cache, must-revalidate"); 
     header("Cache-Control: post-check=0, pre-check=0", false); 
@@ -77,96 +98,21 @@ class EHCS
     set_include_path('c:/wamp/www/petprojects/echs');
     session_start();
   }
-                  
-  //===================================== Database =====================================
   
-  function initDatabase() 
-  { 
-    $databaseConnection = @mysql_connect('localhost', 'root', 'mysqlrt');
-
-    if($databaseConnection == '')
-    {                                                                   
-        $this->redirectWithError(ERROR_CONNECTION); 
-    }
-    
-    $databaseHandle = mysql_select_db('ehcs');
-    
-    if(!$databaseHandle)
-    {                                                          
-        $this->redirectWithError(ERROR_DB); 
-    }
-  }
-          
-  //===================================== User =====================================
-  
-  function checkUserPermission() 
-  {                                         
-    require_once 'User.php';
-    
-    if($this->permissionRequired !== NULL) 
-    {                   
-      $user = new User();
-      if(!$user->isValid() )
-      {
-        $this->redirectWithError(ERROR_LOGIN); 
+  private function checkUserPermission() 
+  {                          
+    if($this->permissionRequired) 
+    {                  
+      if(!User::getInstance()->isValid() )
+      {                                   
+        Redirector::getInstance()->error(ERROR_LOGIN, $this->pagePath); 
       }
-      if(!$user->getPermission($this->permissionRequired)) 
-      { 
-        $this->redirectWithError(ERROR_PERMISSION);  
+      
+      if(!User::getInstance()->getPermission($this->permissionRequired)) 
+      {                                                    
+        Redirector::getInstance()->error(ERROR_PERMISSION);  
       }
     }
-  }  
-  
-  function setUserPermission($permission) 
-  {                  
-    $user = new User();
-    
-  	if($user->isValid() )
-    {
-  		// reset permissions
-  		$user->setPermission(ROLE_DOCTOR, false);
-  		$user->setPermission(ROLE_PATIENT, false);
-  		$user->setPermission(ROLE_ADMIN, false);
-  		
-      switch($permission) 
-      {
-      		case ADMIN: $this->setUserProperty(ROLE_ADMIN, true);
-          case DOCTOR: $this->setUserProperty(ROLE_DOCTOR, true);
-      		case PATIENT: $this->setUserProperty(ROLE_PATIENT, true);
-          break;
-  		} 
-  	}
-  }
-  
-  //===================================== Page =====================================
-  
-  function loadModule($module_array) {  
-    // we're still on the page, let's build the content
-    foreach($module_array as $module)
-    {
-      switch($module)
-      {
-        case MODULE_PAGE_COMMON: 
-          require_once 'PageContent.php';
-          $this->pageContent = new PageContent();
-      }
-    }  
-  }
-  
-  function display() {    
-    $this->pageContent->displayHtmlHeader($this->htmlTitle, $this->htmlHead);  
-    $this->pageContent->displayHtmlBody($this->htmlContent, $this->baseUrl, $this->navPath);           
-    $this->pageContent->displayHtmlFooter();   
-  }
-  
-  //===================================== Request =====================================
-  
-  function getGet($param) {
-    return mysql_real_escape_string(trim($_GET[$param]) ); 
-  }
-  
-  function getPost($param) {
-    return mysql_real_escape_string(trim($_POST[$param]) ); 
-  }
+  } 
 }
 ?>
