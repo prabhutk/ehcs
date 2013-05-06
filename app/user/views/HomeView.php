@@ -3,13 +3,14 @@
 namespace user\views;
 use EHCS\View;
 use EHCS\Config;
+use EHCS\Form;
 
 class HomeView extends View
-{  
-  function display($form)
-  {
-    $this->setHtmlContent($form->getHtml());                  
-    $this->setHtmlFooter(''); 
-    parent::display();
-  }
+{
+    function display(Form $form)
+    {
+        $this->setHtmlContent($form->getHtml());
+        $this->setHtmlFooter('');
+        parent::display();
+    }
 }

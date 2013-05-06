@@ -6,26 +6,8 @@ use hospital\views\HomeView as HomeView;
 
 class HomeController extends Controller
 {
-  function init($module, $controller, $action)
-  {
-    parent::init($module, $controller, $action);
-    $action .= 'Action';
-    $this->$action();
-  }
-  
-  function getView()
-  {
-    if($this->view === NULL)
+    function monthAction()
     {
-      $this->view = new HomeView();
-      $this->view->init($this->getModule(), $this->getController(), $this->getAction());
+        $this->getView($this->getModule(), 'home')->display();
     }
-    return $this->view;
-  }
-   
-  function monthAction()
-  { 
-    $this->getView()->display();
-  
-  }
 }

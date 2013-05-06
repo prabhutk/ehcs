@@ -1,30 +1,32 @@
-<?php      
+<?php
 
 namespace EHCS;
 
 class Config
-{   
-    public static function getInstance() 
+{
+    public static function getInstance()
     {
-      if(!self::$instance) 
-      { 
-        self::$instance = self::parse(APPLICATION_PATH . DIRECTORY_SEPARATOR . CONFIG_PATH); 
-      } 
-    
-      return self::$instance;
+        if (!self::$instance) {
+            self::$instance = self::parse(APPLICATION_PATH . DIRECTORY_SEPARATOR . CONFIG_PATH);
+        }
+
+        return self::$instance;
     }
-    
-    private static $instance;  
-    private function __construct() {} 
-    
+
+    private static $instance;
+
+    private function __construct()
+    {
+    }
+
     /**
      * Internal storage array
      *
      * @var array
      */
     private static $_result = array();
-    
- 
+
+
     /**
      * Loads in the ini file specified in filename, and returns the settings in
      * it as an associative multi-dimensional array
@@ -42,15 +44,15 @@ class Config
     {
         // load the raw ini file
         $ini = parse_ini_file($filename, $process_sections);
- 
+
         // fail if there was an error while processing the specified ini file
         if ($ini === false) {
             return false;
         }
- 
+
         // reset the result array
         self::$_result = array();
- 
+
         if ($process_sections === true) {
             // loop through each section
             foreach ($ini as $section => $contents) {
@@ -61,7 +63,7 @@ class Config
             // treat the whole ini file as a single section
             self::$_result = self::_processSectionContents($ini);
         }
- 
+
         //  extract the required section if required
         if ($process_sections === true) {
             if ($section_name !== null) {
@@ -73,12 +75,12 @@ class Config
                 }
             }
         }
- 
+
         // if no specific section is required, just return the whole result
         return self::$_result;
     }
- 
- 
+
+
     /**
      * Process contents of the specified section
      *
@@ -92,28 +94,28 @@ class Config
         // the section does not extend another section
         if (stripos($section, ':') === false) {
             self::$_result[$section] = self::_processSectionContents($contents);
- 
-        // section extends another section
+
+            // section extends another section
         } else {
             // extract section names
             list($ext_target, $ext_source) = explode(':', $section);
             $ext_target = trim($ext_target);
             $ext_source = trim($ext_source);
- 
+
             // check if the extended section exists
             if (!isset(self::$_result[$ext_source])) {
                 throw new Exception('Unable to extend section ' . $ext_source . ', section not found');
             }
- 
+
             // process section contents
             self::$_result[$ext_target] = self::_processSectionContents($contents);
- 
+
             // merge the new section with the existing section values
             self::$_result[$ext_target] = self::_arrayMergeRecursive(self::$_result[$ext_source], self::$_result[$ext_target]);
         }
     }
- 
- 
+
+
     /**
      * Process contents of a section
      *
@@ -123,20 +125,20 @@ class Config
     private static function _processSectionContents(array $contents)
     {
         $result = array();
- 
+
         // loop through each line and convert it to an array
         foreach ($contents as $path => $value) {
             // convert all a.b.c.d to multi-dimensional arrays
             $process = self::_processContentEntry($path, $value);
- 
+
             // merge the current line with all previous ones
             $result = self::_arrayMergeRecursive($result, $process);
         }
-       
+
         return $result;
     }
- 
- 
+
+
     /**
      * Convert a.b.c.d paths to multi-dimensional arrays
      *
@@ -147,22 +149,22 @@ class Config
     private static function _processContentEntry($path, $value)
     {
         $pos = strpos($path, '.');
- 
+
         if ($pos === false) {
             return array($path => $value);
         }
- 
+
         $key = substr($path, 0, $pos);
         $path = substr($path, $pos + 1);
- 
+
         $result = array(
             $key => self::_processContentEntry($path, $value),
         );
- 
+
         return $result;
     }
- 
- 
+
+
     /**
      * Merge two arrays recursively overwriting the keys in the first array
      * if such key already exists
@@ -180,8 +182,8 @@ class Config
                 if (isset($a[$key])) {
                     $a[$key] = self::_arrayMergeRecursive($a[$key], $value);
                 } else {
-                    if($key === 0) {
-                        $a= array(0 => self::_arrayMergeRecursive($a, $value));
+                    if ($key === 0) {
+                        $a = array(0 => self::_arrayMergeRecursive($a, $value));
                     } else {
                         $a[$key] = $value;
                     }
@@ -191,8 +193,8 @@ class Config
             // one of values is not an array
             $a = $b;
         }
- 
+
         return $a;
     }
- 
+
 }
