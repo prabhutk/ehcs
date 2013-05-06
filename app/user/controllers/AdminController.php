@@ -103,6 +103,7 @@ class AdminController extends Controller
       Redirector::getInstance()->redirect($form->getFailPage(), array('error' => $error));
     } 
   }
-  
-  private $form;
+
+    private $form;
+    private $resetForm;
 }

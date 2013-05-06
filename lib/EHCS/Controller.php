@@ -30,7 +30,7 @@ abstract class Controller
   
   //===================================== private =====================================
           
-  private $view;
+  protected $view;
   private $module;
   private $controller;
   private $action;

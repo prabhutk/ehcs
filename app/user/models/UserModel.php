@@ -4,6 +4,7 @@ namespace user\models;
 use EHCS\Model;
 use EHCS\Request;
 use EHCS\Config;
+use EHCS\Redirector;
 
 class UserModel extends Model
 {                
@@ -32,10 +33,8 @@ class UserModel extends Model
       $error = $config['error']['user']['add'];
       Redirector::getInstance()->redirect('error/page/db/', array('error' => $error));
     }
-    else
-    {
-      return $login;
-    }
+
+    return $login;
   }
 }     
                   
