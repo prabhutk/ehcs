@@ -13,8 +13,8 @@ class ResetForm extends Form
         $config = Config::getInstance();
         return '<form class="form-signin" action="' . BASE_URL . $this->getAction() . '" method="' . $this->getMethod() . '">
               <h2 class="form-signin-heading">Enter password</h2>
-              <input type="password" class="input-block-level" name="login" placeholder="Password">
-              <input type="password" class="input-block-level" name="login2" placeholder="Repeat Password">
+              <input type="password" maxlength="40" class="input-block-level" name="login" placeholder="Password">
+              <input type="password" maxlength="40" class="input-block-level" name="login2" placeholder="Repeat Password">
               <button class="btn btn-large btn-primary" type="submit">Submit</button>
             </form>';
     }

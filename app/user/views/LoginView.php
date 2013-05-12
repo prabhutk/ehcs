@@ -2,11 +2,12 @@
 
 namespace user\views;
 use EHCS\View;
+use EHCS\Form;
 use EHCS\Config;
 
 class LoginView extends View
 {
-    function display($form)
+    function display(Form $form)
     {
         $htmlContent = '<div class="row">
                           <div class="span8">
@@ -34,6 +35,12 @@ class LoginView extends View
                           $("#welcome_carousel").carousel({ interval: 3000 });
                         });
                       </script>');
+        parent::display();
+    }
+
+    function displayReset(Form $form)
+    {
+        $this->setHtmlContent($form->getHtml());
         parent::display();
     }
 }

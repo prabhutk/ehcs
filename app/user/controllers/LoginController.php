@@ -6,7 +6,6 @@ use EHCS\User;
 use EHCS\Config;
 use EHCS\Redirector;
 use user\views\LoginView;
-use user\views\ResetView;
 use user\forms\LoginForm;
 use user\forms\ActivateForm;
 use user\forms\ResetForm;
@@ -16,21 +15,21 @@ class LoginController extends Controller
 {
     function indexAction()
     {
-        $this->getView($this->getModule(), 'login')->display($this->getForm($this->getModule(), 'login'));
+        $this->getView($this->getModule(), $this->getController())->display($this->getForm($this->getModule(), $this->getController()));
     }
 
     function verifyAction()
     {
-        $form = $this->getForm($this->getModule(), 'login');
+        $form = $this->getForm($this->getModule(), $this->getController());
         $config = Config::getInstance();
 
         if ($form->validate()) {
-            $model =  $this->getModel($this->getModule(), 'login');
+            $model =  $this->getModel($this->getModule(), $this->getController());
             $result = $model->authenticate();
 
             if ($result->num_rows === 1) {
                 $row = $result->fetch_object();
-                $success = $config['success']['user']['login'];
+                $success = $config['success'][$this->getModule()][$this->getController()];
 
                 User::getInstance()->login();
                 User::getInstance()->setPermission($row->Role);
@@ -38,22 +37,22 @@ class LoginController extends Controller
                 Redirector::getInstance()->redirect($form->getPassPage(), array('success' => $success));
             } else {
 
-                $error = $config['error']['user']['login'];
+                $error = $config['error'][$this->getModule()][$this->getController()];
                 Redirector::getInstance()->redirect($form->getFailPage(), array('error' => $error));
             }
         } else {
-            $error = $config['error']['user']['email'];
+            $error = $config['error'][$this->getModule()]['email'];
             Redirector::getInstance()->redirect($form->getFailPage(), array('error' => $error));
         }
     }
 
     function activateAction()
     {
-        $form = $this->getForm($this->getModule(), 'activate');
+        $form = $this->getForm($this->getModule(), $this->getController());
         $config = Config::getInstance();
 
         if ($form->validate()) {
-            $model =  $this->getModel($this->getModule(), 'login');
+            $model =  $this->getModel($this->getModule(), $this->getController());
             $result = $model->verifyActivateLink();
 
             if ($result->num_rows === 1) {
@@ -64,29 +63,29 @@ class LoginController extends Controller
                 User::getInstance()->setAttribute(ATTR_USER_ID, $row->UserId);
 
                 // take to change-password page
-                $success = $config['success']['user']['activate'];
+                $success = $config['success'][$this->getModule()][$this->getAction()];
                 Redirector::getInstance()->redirect($form->getPassPage(), array('success' => $success));
             } else {
                 // take to report-problem page
-                $error = $config['error']['user']['activate'];
+                $error = $config['error'][$this->getModule()][$this->getAction()];
                 Redirector::getInstance()->redirect($form->getFailPage(), array('error' => $error));
             }
         } else {
-            $error = $config['error']['user']['activate'];
+            $error = $config['error'][$this->getModule()][$this->getAction()];
             Redirector::getInstance()->redirect($form->getFailPage(), array('error' => $error));
         }
     }
 
     function resetAction()
     {
-        $this->getView($this->getModule(), 'reset')->display($this->getForm($this->getModule(), 'reset'));
+        $this->getView($this->getModule(), $this->getController())->display($this->getForm($this->getModule(), $this->getAction()));
     }
 
     function logoutAction()
     {
         User::getInstance()->logout();
         $config = Config::getInstance();
-        $success = $config['success']['user']['logout'];
-        Redirector::getInstance()->redirect($this->getForm($this->getModule(), 'login')->getFailPage(), array('success' => $success));
+        $success = $config['success'][$this->getModule()][$this->getAction()];
+        Redirector::getInstance()->redirect($this->getForm($this->getModule(), $this->getAction())->getFailPage(), array('success' => $success));
     }
 }

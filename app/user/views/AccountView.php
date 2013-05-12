@@ -5,9 +5,9 @@ use EHCS\View;
 use EHCS\Config;
 use EHCS\Form;
 
-class HomeView extends View
+class AccountView extends View
 {
-    function display(Form $form)
+    function displayReset(Form $form)
     {
         $this->setHtmlContent($form->getHtml());
         $this->setHtmlFooter('');

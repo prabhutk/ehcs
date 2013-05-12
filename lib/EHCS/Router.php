@@ -24,16 +24,8 @@ class Router
         // re-route to home pages
         if ($module === 'index' && $controller === 'index' && $action === 'index') {
             $module = 'appointment';
-            $controller = 'home';
-            $action = 'month';
-        }
-        if ($module === 'hospital' && $controller === 'index' && $action === 'index') {
-            $controller = 'home';
-            $action = 'month';
-        }
-        if ($module === 'user' && $controller === 'index' && $action === 'index') {
-            $controller = 'home';
-            $action = 'month';
+            $controller = 'month';
+            $action = 'view';
         }
 
         $config = Config::getInstance();

@@ -8,9 +8,13 @@ use EHCS\Redirector;
 
 class UserModel extends Model
 {
-    function init()
+    public function fetchAll()
     {
-        parent::init();
+        $config = Config::getInstance();
+        $sql = "SELECT `UserId`, `Email`, `Role`, `IsActive`
+            FROM `" . $config['db']['name'] . "`.`user_login`";
+
+        return $this->runSql($sql);
     }
 
     public function save()

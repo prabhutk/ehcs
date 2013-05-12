@@ -8,11 +8,6 @@ use EHCS\User;
 
 class LoginModel extends Model
 {
-    function init()
-    {
-        parent::init();
-    }
-
     public function authenticate()
     {
         $email = Request::getInstance()->getPost('email');

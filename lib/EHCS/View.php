@@ -152,12 +152,10 @@ public function displayHtmlBody()
     {
         $config = Config::getInstance();
 
-        foreach(array_keys($config['msg']) as $messageType)
-        {
+        foreach (array_keys($config['msg']) as $messageType) {
             $message = Request::getInstance()->getGet($messageType);
 
-            if($message !== NULL)
-            {
+            if ($message !== NULL) {
                 echo '<div class="container"><table class="table"><tr class="' . $messageType . '"><td>' . $message . '</td><tr></table></div>';
             }
         }

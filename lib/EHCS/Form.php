@@ -5,6 +5,7 @@ namespace EHCS;
 abstract class Form
 {
     public abstract function getHtml();
+
     public abstract function validate();
 
     public function init($module, $form)

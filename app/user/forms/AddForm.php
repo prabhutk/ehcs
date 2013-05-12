@@ -12,7 +12,7 @@ class AddForm extends Form
     {
         $form = '<form class="form-user-add" action="' . BASE_URL . $this->getAction() . '" method="POST">
               <h2 class="form-user-heading">Add user</h2>
-              <input type="text" class="input-block-level" name="email" placeholder="Email address">
+              <input type="text" maxlength="64" class="input-block-level" name="email" placeholder="Email address">
               <div>
                 <select name="role">';
 
