@@ -17,10 +17,12 @@ class UserModel extends Model
         return $this->runSql($sql);
     }
 
-    public function save()
+    public function save($role = '')
     {
         $email = Request::getInstance()->getPost('email');
-        $role = Request::getInstance()->getPost('role');
+        if($role !== '') {
+            $role = Request::getInstance()->getPost('role');
+        }
 
         $config = Config::getInstance();
         $login = $this->createHash($email, $config['db']['salt']);

@@ -6,7 +6,7 @@ use EHCS\Config;
 
 class MonthView extends View
 {
-    function display($appointments)
+    function display($appointments = array())
     {
         $html = '<h3><a class="btn btn-mini" href="' . BASE_URL . 'appointment/appointment/add/' . '" title="Add"><i class="icon-plus-sign"></i></a> Appointments</h3>
                 <table class="table table-bordered table-hover">

@@ -7,7 +7,7 @@ use EHCS\Form;
 
 class UserView extends View
 {
-    function display($users)
+    function display($users = array())
     {
         $html = '<h3><a class="btn btn-mini" href="' . BASE_URL . 'user/user/add/' . '" title="Add"><i class="icon-plus-sign"></i></a> Users</h3>
                 <table class="table table-bordered table-hover">

@@ -7,7 +7,7 @@ use EHCS\Config;
 
 class LoginView extends View
 {
-    function display(Form $form)
+    function display(Form $form = null, Form $signupForm = null)
     {
         $htmlContent = '<div class="row">
                           <div class="span8">
@@ -26,14 +26,27 @@ class LoginView extends View
                             <a class="carousel-control right" href="#welcome_carousel" data-slide="next">&rsaquo;</a>
                           </div>
                         </div>         
-                        <div class="span4">' . $form->getHtml() . '</div>
+                        <div class="span4">
+                            <div>' . $form->getHtml() . '</div>';
+        if($signupForm) {
+            $htmlContent .= '<div>' . $signupForm->getHtml() . '</div>';
+        }
+
+        $htmlContent .= '</div>
                       </div>';
 
         $this->setHtmlContent($htmlContent);
+
+        $htmlHead = '<link rel="stylesheet" href="' . BASE_URL . 'js/dijit/themes/claro/claro.css">';
+        $this->setHtmlHead($htmlHead);
+
         $this->setHtmlFooter('<script type="text/javascript">
                         $(document).ready(function(){
                           $("#welcome_carousel").carousel({ interval: 3000 });
                         });
+                      $(function() {
+                        $( "#appt_date" ).datepicker({dateFormat: "yy-mm-dd"});
+                      });
                       </script>');
         parent::display();
     }

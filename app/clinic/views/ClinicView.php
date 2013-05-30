@@ -7,7 +7,7 @@ use EHCS\Form;
 
 class ClinicView extends View
 {
-    function display($clinics)
+    function display($clinics = array())
     {
         $html = '<h3><a class="btn btn-mini" href="' . BASE_URL . 'clinic/clinic/add/' . '" title="Add"><i class="icon-plus-sign"></i></a> Clinics</h3>
                 <table class="table table-bordered table-hover">

@@ -14,7 +14,7 @@ class MonthController extends Controller
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_object()) {
                 $appointments[] = array(
-                    'AppointMentId' => $row->AppointMentId,
+                    'AppointmentId' => $row->AppointmentId,
                     'PatientName' => $row->PatientName,
                     'DoctorName' => $row->DoctorName,
                     'StartTime' => $row->StartTime,

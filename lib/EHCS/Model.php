@@ -34,6 +34,31 @@ abstract class Model
         return $this->mysqli->affected_rows;
     }
 
+    public function getLastInsertId()
+    {
+        return $this->mysqli->insert_id;
+    }
+
+    public function beginTransaction()
+    {
+        $this->mysqli->autocommit(FALSE);
+    }
+
+    public function commit()
+    {
+        return $this->mysqli->commit();
+    }
+
+    public function rollback()
+    {
+        return $this->mysqli->rollback();
+    }
+
+    public function error()
+    {
+        return $this->mysqli->error;
+    }
+
     public function createHash($inText, $saltHash = NULL, $mode = 'sha1')
     {
         // hash the text //

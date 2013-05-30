@@ -45,9 +45,7 @@ class Router
                 }
             }
         } else {
-            echo $module . ' == ' . $controller . ' == ' . $action;
-            exit;
-            $error = $config['error']['page']['notfound'];
+            $error = BASE_URL . $module . '/' . $controller . '/' . $action . ' was not found.';
             Redirector::getInstance()->redirect('error/page/notfound/', array('error' => $error));
         }
 
@@ -66,6 +64,9 @@ class Router
 
     private function sanitize($value)
     {
+        if(strchr($value, '?')) {
+            $value = substr($value, 0, strpos($value, '?'));
+        }
         $value = Request::getInstance()->sanitize($value);
         return strlen($value) === 0 ? 'index' : $value;
     }

@@ -17,7 +17,7 @@ abstract class View
 
     public function setHtmlHead($htmlHead)
     {
-        $this->htmlHead = $htmlHead;
+        $this->htmlHead .= $htmlHead;
     }
 
     public function setHtmlContent($htmlContent)
@@ -63,6 +63,7 @@ abstract class View
             <title>ECSH :: <?php echo $this->htmlTitle; ?></title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <link href="<?php echo BASE_URL; ?>css/bootstrap.min.css" rel="stylesheet" media="screen">
+            <link href="<?php echo BASE_URL; ?>css/jquery-ui.min.css" rel="stylesheet" media="screen">
             <link rel='shortcut icon' href='<?php echo BASE_URL; ?>favicon.ico'/>
             <?php echo $this->htmlHead; ?>
         </head>
@@ -75,7 +76,7 @@ public function displayHtmlBody()
 {
 
     ?>
-<body>
+<body class="claro">
     <?php
 
     if (strlen($this->navPath) !== 0) {
@@ -92,7 +93,8 @@ public function displayHtmlBody()
         ?>
 
         </div> <!-- /.container -->
-        <script type="text/javascript" src="<?php echo BASE_URL; ?>js/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="<?php echo BASE_URL; ?>js/jquery.min.js"></script>
+        <script type="text/javascript" src="<?php echo BASE_URL; ?>js/jquery-ui.min.js"></script>
         <script type="text/javascript" src="<?php echo BASE_URL; ?>js/bootstrap.min.js"></script>
         </body>
         <?php echo $this->htmlFooter; ?>

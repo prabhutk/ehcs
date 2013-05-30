@@ -2,7 +2,7 @@
 
 session_start();
 define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../app'));
-define('BASE_URL', 'http://localhost/petprojects/ehcs/public/');
+define('BASE_URL', 'http://127.0.0.1/ehcs/public/');
 define('CONFIG_PATH', '../config/ehcs.ini');
 
 set_include_path(implode(';', array(
